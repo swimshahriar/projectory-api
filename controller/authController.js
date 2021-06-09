@@ -1,37 +1,20 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+// catch async handler
+import catchAsync from "../utils/catchAsync.js";
 
 // user model
 import { User } from "../model/userModel.js";
 
 // register
-export const registerHandler = async (req, res, next) => {
-  const { firstName, lastName, email, password } = req.body;
+export const registerHandler = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
 
-  // checking, if user email already exists or not
-  let existingEmail;
-  try {
-    existingEmail = await User.findOne({ email });
-  } catch (error) {
-    const err = new Error("Registration failed!");
-    return next(err);
-  }
-
-  // if email exists, show error
-  if (existingEmail) {
-    const error = new Error("Email already exists!");
-    return next(error);
-  }
-
-  // password hashing
-  let hashedPass;
-  try {
-    hashedPass = await bcrypt.hash(password, 10);
-  } catch (error) {
-    const err = new Error("Registration failed!");
-    return next(err);
-  }
-};
+  return res.status(201).json({
+    status: "success",
+    message: { user: newUser },
+  });
+});
 
 // login
 export const loginHandler = (req, res) => {

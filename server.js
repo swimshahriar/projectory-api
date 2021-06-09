@@ -5,6 +5,12 @@ import helmet from "helmet";
 import logger from "morgan";
 import dotenv from "dotenv";
 
+// uncought exception handler
+process.on("uncaughtException", (err) => {
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+
 // error handler
 import AppError from "./utils/appError.js";
 import globalErrorHandler from "./controller/errorController.js";
@@ -46,6 +52,7 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 // server connect
+let server;
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -54,6 +61,12 @@ mongoose
   })
   .then(() => {
     console.log("DB Connected!");
-    app.listen(process.env.PORT || 8000, () => console.log("Server Started."));
-  })
-  .catch((err) => console.log(err.message));
+    server = app.listen(process.env.PORT || 8000, () =>
+      console.log("Server Started.")
+    );
+  });
+
+process.on("unhandledRejection", (err) => {
+  console.error(err.name, err.message);
+  server.close(() => process.exit(1));
+});

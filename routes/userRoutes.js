@@ -12,4 +12,4 @@ router.post("/register", registerHandler);
 router.post("/login", loginHandler);
 
 // export
-export const authRoutes = router;
+export const userRoutes = router;

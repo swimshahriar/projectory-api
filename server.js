@@ -16,7 +16,7 @@ import AppError from "./utils/appError.js";
 import globalErrorHandler from "./controller/errorController.js";
 
 // router
-import { authRoutes } from "./routes/authRoutes.js";
+import { userRoutes } from "./routes/userRoutes.js";
 
 // env variable
 dotenv.config();
@@ -37,14 +37,9 @@ app.use(express.json());
 
 // routes
 // auth routes
-app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 app.all("*", (req, res, next) => {
-  // res.status(404).json({
-  //   status: "fail",
-  //   message: `cannot find ${req.originalUrl} on this server!`,
-  // });
-
   next(new AppError(`cannot find ${req.originalUrl} on this server!`, 404));
 });
 

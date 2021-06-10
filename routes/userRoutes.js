@@ -5,10 +5,8 @@ const router = express.Router();
 import { registerHandler, loginHandler } from "../controller/authController.js";
 
 // routes
-// register
+// auth
 router.post("/register", registerHandler);
-
-// login
 router.post("/login", loginHandler);
 
 // export

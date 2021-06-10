@@ -66,6 +66,20 @@ export const loginHandler = catchAsync(async (req, res, next) => {
   });
 });
 
+// forgot password - token create and send email
+export const forgotPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new AppError("There is no user with this email address.", 404));
+  }
+
+  // get reset token and save it in db
+  const resetToken = user.createPasswordResetToken();
+
+  await user.save({ validateBeforeSave: false });
+});
+
 // check for authentication
 export const isAuth = catchAsync(async (req, res, next) => {
   let token;

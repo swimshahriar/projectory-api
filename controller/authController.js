@@ -66,7 +66,7 @@ export const loginHandler = catchAsync(async (req, res, next) => {
   });
 });
 
-// check for authorization
+// check for authentication
 export const isAuth = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -100,7 +100,20 @@ export const isAuth = catchAsync(async (req, res, next) => {
     );
   }
 
-  // authorized
+  // authenticated
   req.user = freshUser;
   next();
 });
+
+// restrict by role - authorization
+export const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new App("You do not have permission to perform this action.", 403)
+      );
+    }
+
+    next();
+  };
+};

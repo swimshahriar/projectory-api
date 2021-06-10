@@ -22,6 +22,13 @@ const validationErrorHandler = (err) => {
   return new AppError(message, 400);
 };
 
+// jwt error
+const jwtErrorHandler = () =>
+  new AppError("Invalid token. Please login again.", 401);
+
+const jwtExpiredErrorHanlder = () =>
+  new AppError("Expired token. Please login again.", 401);
+
 export default (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
@@ -32,6 +39,8 @@ export default (error, req, res, next) => {
     if (err.name === "CastError") err = castErrorHandler(err);
     if (err.code === 11000) err = duplicatedFieldValueHandler(err);
     if (err.name === "ValidationError") err = validationErrorHandler(err);
+    if (err.name === "JsonWebTokenError") err = jwtErrorHandler();
+    if (err.name === "TokenExpiredError") err = jwtExpiredErrorHanlder();
 
     // operational error: trusted error
     if (err.isOperational) {

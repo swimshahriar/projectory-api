@@ -1,4 +1,5 @@
 import { promisify } from "util";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
 // catch async handler
@@ -28,6 +29,7 @@ export const registerHandler = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
@@ -110,6 +112,40 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
       )
     );
   }
+});
+
+// reset password
+export const resetPassword = catchAsync(async (req, res, next) => {
+  // getting user form token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // if user exist change password
+  if (!user) {
+    return next(new AppError("Token is invalid or has expired.", 400));
+  }
+
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save({ validateBeforeSave: true });
+
+  // sign token and send it
+  const token = signToken(user._id);
+
+  return res.status(200).json({
+    status: "success",
+    token,
+  });
 });
 
 // check for authentication

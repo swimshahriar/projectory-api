@@ -56,6 +56,14 @@ userSchema.pre("save", async function (next) {
   this.confirmPassword = undefined; // delete confirm field
 });
 
+// on password change update changed at time
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000; // 1 sec past because sign token may take some time
+  next();
+});
+
 // compare password
 userSchema.methods.correctPassword = async function (
   candidatePassword,

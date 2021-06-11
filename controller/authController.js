@@ -21,6 +21,18 @@ const decodeToken = (token) => {
   return jwt.decode(token, process.env.JWT_SECRET);
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  const { exp } = decodeToken(token);
+
+  return res.status(statusCode).json({
+    status: "success",
+    token,
+    expiresAt: exp,
+    data: { user },
+  });
+};
+
 // register
 export const registerHandler = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -32,15 +44,7 @@ export const registerHandler = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-  const { exp } = decodeToken(token);
-
-  return res.status(201).json({
-    status: "success",
-    token,
-    expiresAt: exp,
-    data: { user: newUser },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 // login
@@ -59,14 +63,7 @@ export const loginHandler = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect email or password", 401));
   }
 
-  const token = signToken(user._id);
-  const { exp } = decodeToken(token);
-
-  return res.status(200).json({
-    status: "success",
-    token,
-    expiresAt: exp,
-  });
+  createSendToken(user, 200, res);
 });
 
 // forgot password - token create and send email
@@ -140,12 +137,26 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: true });
 
   // sign token and send it
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  return res.status(200).json({
-    status: "success",
-    token,
-  });
+// change password
+export const changePassword = catchAsync(async (req, res, next) => {
+  // check user from db
+  const user = await User.findById(req.user.id).select("+password");
+
+  // if current pass is correct
+  if (!(await user.correctPassword(req.body.currentPassword, user.password))) {
+    return next(new AppError("Your current password is wrong"));
+  }
+
+  // update pass
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+
+  // sign token and send it
+  createSendToken(user, 200, res);
 });
 
 // check for authentication
@@ -168,7 +179,7 @@ export const isAuth = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // is user still exist
-  const freshUser = User.findById(decoded.id);
+  const freshUser = await User.findById(decoded.id);
   if (!freshUser) {
     return next(
       new AppError("The user belonging to this token does not exist.", 401)

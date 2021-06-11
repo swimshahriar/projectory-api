@@ -73,7 +73,7 @@ userSchema.methods.correctPassword = async function (
 };
 
 // is password changed
-userSchema.methods.chagedPasswordAfter = function (jwtTimestamp) {
+userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,

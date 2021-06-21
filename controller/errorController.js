@@ -8,6 +8,7 @@ const castErrorHandler = (err) => {
 
 // duplicated field value
 const duplicatedFieldValueHandler = (err) => {
+  console.log(err);
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
   const message = `Duplicate field value: ${value}. Please use another value!`;
 

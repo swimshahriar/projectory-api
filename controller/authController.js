@@ -17,6 +17,7 @@ const signToken = (id) => {
   });
 };
 
+// helper functions
 const decodeToken = (token) => {
   return jwt.decode(token, process.env.JWT_SECRET);
 };
@@ -35,13 +36,15 @@ const createSendToken = (user, statusCode, res) => {
 
 // register
 export const registerHandler = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   const newUser = await User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
+    userName: req.body.userName,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    role: req.body.role,
+    role: req.body.role || "user",
   });
 
   createSendToken(newUser, 201, res);

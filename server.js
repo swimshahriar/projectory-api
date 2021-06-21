@@ -24,13 +24,11 @@ dotenv.config();
 const app = express();
 
 // middlewares
-if (process.env.NODE_ENV === "developement") {
-  app.use(logger("tiny"));
-}
+app.use(logger("tiny"));
 app.use(helmet());
 app.use(
   cors({
-    origin: ["*"],
+    origin: ["http://localhost:3000", "*"],
   })
 );
 app.use(express.json());

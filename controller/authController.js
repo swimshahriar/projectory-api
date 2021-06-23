@@ -28,15 +28,14 @@ const createSendToken = (user, statusCode, res) => {
 
   return res.status(statusCode).json({
     status: "success",
+    uid: user._id,
     token,
     expiresAt: exp,
-    data: { user },
   });
 };
 
 // register
 export const registerHandler = catchAsync(async (req, res, next) => {
-  console.log(req.body);
   const newUser = await User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -44,7 +43,7 @@ export const registerHandler = catchAsync(async (req, res, next) => {
     userName: req.body.userName,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    role: req.body.role || "user",
+    role: req.body.role,
   });
 
   createSendToken(newUser, 201, res);

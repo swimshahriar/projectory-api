@@ -136,8 +136,11 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: true });
 
-  // sign token and send it
-  createSendToken(user, 200, res);
+  // success response
+  return res.status(200).json({
+    status: "success",
+    message: "Password changed, please try to login!",
+  });
 });
 
 // change password

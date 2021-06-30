@@ -19,6 +19,57 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email."],
   },
+  tagLine: {
+    type: String,
+    maxlenth: 50,
+    default: undefined,
+  },
+  location: {
+    type: String,
+    default: undefined,
+  },
+  description: {
+    type: String,
+    maxlenth: 150,
+    default: undefined,
+  },
+  languages: {
+    type: [
+      {
+        title: String,
+        level: String,
+      },
+    ],
+    default: undefined,
+  },
+  linkedAccounts: [
+    {
+      title: {
+        type: String,
+        required: [true, "LinkedAccount title required"],
+      },
+      link: {
+        type: String,
+        validate: [validator.isURL],
+        required: [true, "LinkedAccount link required"],
+      },
+    },
+  ],
+  skills: {
+    type: Array,
+    default: undefined,
+  },
+  education: {
+    type: [
+      {
+        degree: String,
+        institute: String,
+        location: String,
+        year: Number,
+      },
+    ],
+    default: undefined,
+  },
   role: {
     type: String,
     enum: ["user", "admin"],
@@ -48,7 +99,6 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
-    select: false,
   },
 });
 

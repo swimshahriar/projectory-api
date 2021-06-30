@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email."],
   },
+  avatar: {
+    type: String,
+    validate: [validator.isURL, "Please provide a photo url."],
+    default: undefined,
+  },
   tagLine: {
     type: String,
     maxlenth: 50,
@@ -36,8 +41,14 @@ const userSchema = new mongoose.Schema({
   languages: {
     type: [
       {
-        title: String,
-        level: String,
+        title: {
+          type: String,
+          required: true,
+        },
+        level: {
+          type: String,
+          required: true,
+        },
       },
     ],
     default: undefined,
@@ -57,22 +68,35 @@ const userSchema = new mongoose.Schema({
   ],
   skills: {
     type: Array,
+    validate: [validator.isEmpty, "Cannot be empty"],
     default: undefined,
   },
   education: {
     type: [
       {
-        degree: String,
-        institute: String,
-        location: String,
-        year: Number,
+        degree: {
+          type: String,
+          required: true,
+        },
+        institute: {
+          type: String,
+          required: true,
+        },
+        location: {
+          type: String,
+          required: true,
+        },
+        year: {
+          type: Number,
+          required: true,
+        },
       },
     ],
     default: undefined,
   },
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user"],
     default: "user",
   },
   password: {

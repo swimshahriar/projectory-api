@@ -32,8 +32,12 @@ export const updateUserInfo = catchAsync(async (req, res, next) => {
 
   const oldUserData = await User.findById(uid);
 
-  const newUserData = { ...oldUserData._doc, ...req.body };
-  await User.findOneAndUpdate({ _id: uid }, { ...newUserData });
+  // const newUserData = { ...oldUserData._doc, ...req.body };
+  const newUserData = await User.findOneAndUpdate(
+    { _id: uid },
+    { ...oldUserData._doc, ...req.body },
+    { new: true, runValidators: true, context: "query" }
+  );
 
   res.status(200).json({
     status: "success",

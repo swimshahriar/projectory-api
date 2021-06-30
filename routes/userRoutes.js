@@ -10,8 +10,12 @@ import {
   isAuth,
   changePassword,
 } from "../controller/authController.js";
+import { getUserInfo, updateUserInfo } from "../controller/userController.js";
 
 // routes
+router.patch("/", isAuth, updateUserInfo);
+router.get("/:uid", getUserInfo);
+
 // auth
 router.post("/register", registerHandler);
 router.post("/login", loginHandler);

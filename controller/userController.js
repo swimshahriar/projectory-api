@@ -32,7 +32,6 @@ export const updateUserInfo = catchAsync(async (req, res, next) => {
 
   const oldUserData = await User.findById(uid);
 
-  // const newUserData = { ...oldUserData._doc, ...req.body };
   const newUserData = await User.findOneAndUpdate(
     { _id: uid },
     { ...oldUserData._doc, ...req.body },

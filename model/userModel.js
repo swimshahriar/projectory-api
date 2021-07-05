@@ -68,7 +68,6 @@ const userSchema = new mongoose.Schema({
   ],
   skills: {
     type: Array,
-    validate: [validator.isEmpty, "Cannot be empty"],
     default: undefined,
   },
   education: {

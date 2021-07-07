@@ -31,7 +31,8 @@ app.use(
     origin: ["http://localhost:3000", "*"],
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "30mb" }));
+app.use(express.urlencoded({ limit: "30mb", extended: true }));
 
 // routes
 // auth routes

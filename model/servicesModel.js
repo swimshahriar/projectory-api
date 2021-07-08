@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 import validator from "validator";
 
 const servicesSchema = new mongoose.Schema({
@@ -17,6 +17,11 @@ const servicesSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: [true, "User id is required."],
   },
+  category: {
+    type: String,
+    enum: ["web-developement", "mobile-developement", "graphics-designing"],
+    required: [true, "Category is required."],
+  },
   ratings: [
     {
       star: {
@@ -28,7 +33,9 @@ const servicesSchema = new mongoose.Schema({
         type: String,
         maxlength: 100,
       },
-      createdAt: Date.now(),
+      createdAt: {
+        type: Date,
+      },
     },
   ],
   packages: [
@@ -37,7 +44,6 @@ const servicesSchema = new mongoose.Schema({
         type: String,
         enum: ["Basic", "Standard", "Premium"],
         required: true,
-        lowercase: true,
       },
       price: {
         type: Number,

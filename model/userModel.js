@@ -59,6 +59,14 @@ const userSchema = new mongoose.Schema({
     type: Array,
     default: undefined,
   },
+  services: {
+    type: Array,
+    default: undefined,
+  },
+  favoriteServices: {
+    type: Array,
+    default: undefined,
+  },
   educations: {
     type: Array,
     default: undefined,

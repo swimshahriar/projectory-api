@@ -6,10 +6,31 @@ import AppError from "../utils/appError.js";
 
 // get sercvices info
 export const getServices = catchAsync(async (req, res, next) => {
-  const services = await Services.find();
+  let services;
+
+  // filter query
+  if (req.query.id) {
+    services = await Services.findOne({ _id: req.query.id });
+  } else if (req.query.uid) {
+    services = await Services.find({ userId: req.query.uid });
+  } else if (req.query.category) {
+    services = await Services.find({ category: req.query.category });
+  } else {
+    services = await Services.find();
+  }
+
+  // no services found
+  if (!services) {
+    return res.json({
+      status: "success",
+      length: 0,
+      services: [],
+    });
+  }
 
   return res.json({
     status: "success",
+    length: services.length || 1,
     services,
   });
 });

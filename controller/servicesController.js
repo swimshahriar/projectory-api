@@ -1,5 +1,8 @@
 import { Services } from "../model/servicesModel.js";
 
+// config
+import cloudinary from "../config/cloudinary.js";
+
 // error handler
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
@@ -50,8 +53,18 @@ export const createServices = catchAsync(async (req, res, next) => {
     return next(new AppError("Max services reached (6)!", 400));
   }
 
+  // upload images to cloudinary
+  const imgUrls = [];
+  for (img in req.body.images) {
+    const uploadedImg = await cloudinary.uploader.upload(img, {
+      upload_preset: "upload_service",
+    });
+    imgUrls.push(uploadedImg.url);
+  }
+
   const service = await Services.create({
     ...req.body,
+    images: imgUrls,
     userId,
   });
 

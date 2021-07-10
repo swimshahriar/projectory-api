@@ -60,3 +60,38 @@ export const createServices = catchAsync(async (req, res, next) => {
     service,
   });
 });
+
+// update services
+export const updateServices = catchAsync(async (req, res, next) => {
+  const { sid } = req.params;
+  const { _id: uid } = req.user;
+
+  // check if req.body is empty
+  if (Object.keys(req.body).length === 0) {
+    return next(new AppError("Request body cannot be empty!", 400));
+  }
+
+  // check if service exist
+  const service = await Services.findById(sid);
+
+  if (!service) {
+    return next(new AppError("No serive found with provied id.", 404));
+  }
+
+  // check if requested user is the creator of the service
+  if (service.userId.toString() !== uid.toString()) {
+    return next(new AppError("You do not have the permission.", 403));
+  }
+
+  // update
+  const updatedService = await Services.findOneAndUpdate(
+    { _id: sid },
+    { ...req.body },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    services: updatedService,
+  });
+});

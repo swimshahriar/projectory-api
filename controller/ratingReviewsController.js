@@ -98,3 +98,66 @@ export const createRatingReviews = catchAsync(async (req, res, next) => {
     ratings,
   });
 });
+
+// delete rating reviews
+export const deleteRatingReviews = catchAsync(async (req, res, next) => {
+  const { rid } = req.params;
+  const { _id: uid } = req.user;
+
+  // check if the rating exist
+  const rating = await Ratings.findById(rid);
+
+  if (!rating || rating.length <= 0) {
+    return next(new AppError("No rating found with provided id.", 404));
+  }
+
+  // check if the user is creator of the rating or admin
+  if (
+    rating.userId.toString() !== uid.toString() &&
+    req.user.role !== "admin"
+  ) {
+    console.log(rating.userId.toString() !== uid.toString());
+    return next(new AppError("You do not have the permission to delete.", 403));
+  }
+
+  const { serviceId } = rating;
+
+  // delete
+  await Ratings.deleteOne({ _id: rid });
+
+  // update rating count of the service
+  const allRatings = await Ratings.find({ serviceId });
+  if (!allRatings || allRatings.length <= 0) {
+    await Services.findOneAndUpdate(
+      { _id: serviceId },
+      {
+        rating: {
+          rating: 0,
+          count: 0,
+        },
+      }
+    );
+
+    return res.status(200).json({
+      status: "success",
+    });
+  }
+
+  // more rating of service > 0
+  const newRating =
+    allRatings.reduce((acc, curr) => (acc += curr.star), 0) / allRatings.length;
+
+  await Services.findOneAndUpdate(
+    { _id: serviceId },
+    {
+      rating: {
+        rating: +newRating.toFixed(2),
+        count: allRatings.length,
+      },
+    }
+  );
+
+  return res.status(200).json({
+    status: "success",
+  });
+});

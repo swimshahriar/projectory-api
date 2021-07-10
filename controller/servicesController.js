@@ -20,7 +20,7 @@ export const getServices = catchAsync(async (req, res, next) => {
   }
 
   // no services found
-  if (!services) {
+  if (!services || services.length <= 0) {
     return res.json({
       status: "success",
       length: 0,
@@ -75,7 +75,7 @@ export const updateServices = catchAsync(async (req, res, next) => {
   const service = await Services.findById(sid);
 
   if (!service) {
-    return next(new AppError("No serive found with provied id.", 404));
+    return next(new AppError("No service found with provied id.", 404));
   }
 
   // check if requested user is the creator of the service
@@ -90,8 +90,33 @@ export const updateServices = catchAsync(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     services: updatedService,
+  });
+});
+
+// delete service
+export const deleteService = catchAsync(async (req, res, next) => {
+  const { sid } = req.params;
+  const { _id: uid } = req.user;
+
+  // check if service exist
+  const service = await Services.findById(sid);
+
+  if (!service) {
+    return next(new AppError("No service found with provied id.", 404));
+  }
+
+  // check if requested user is the creator of the service
+  if (service.userId.toString() !== uid.toString()) {
+    return next(new AppError("You do not have the permission.", 403));
+  }
+
+  // delete
+  await Services.findOneAndDelete({ _id: sid });
+
+  res.status(200).json({
+    status: "success",
   });
 });

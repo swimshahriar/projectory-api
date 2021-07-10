@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import validator from "validator";
 
 const servicesSchema = new mongoose.Schema(
   {
@@ -23,22 +22,6 @@ const servicesSchema = new mongoose.Schema(
       enum: ["web-developement", "mobile-developement", "graphics-designing"],
       required: [true, "Category is required."],
     },
-    ratings: [
-      {
-        star: {
-          type: Number,
-          max: [5, "star cannot be greater than 5."],
-        },
-        uid: Object,
-        review: {
-          type: String,
-          maxlength: 100,
-        },
-        createdAt: {
-          type: Date,
-        },
-      },
-    ],
     packages: [
       {
         name: {

@@ -9,7 +9,7 @@ const ratingReviewsSchema = new mongoose.Schema(
     },
     review: {
       type: String,
-      maxlength: 50,
+      maxlength: 100,
       default: undefined,
     },
     userId: {

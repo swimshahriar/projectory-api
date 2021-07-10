@@ -22,6 +22,12 @@ const servicesSchema = new mongoose.Schema(
       enum: ["web-developement", "mobile-developement", "graphics-designing"],
       required: [true, "Category is required."],
     },
+    rating: {
+      type: Object,
+      default: undefined,
+      rating: Number,
+      count: Number,
+    },
     packages: [
       {
         name: {

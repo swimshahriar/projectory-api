@@ -1,7 +1,7 @@
 import { Services } from "../model/servicesModel.js";
 
 // config
-import cloudinary from "../config/cloudinary.js";
+import { cloudinary } from "../config/cloudinary.js";
 
 // error handler
 import catchAsync from "../utils/catchAsync.js";
@@ -53,13 +53,24 @@ export const createServices = catchAsync(async (req, res, next) => {
     return next(new AppError("Max services reached (6)!", 400));
   }
 
+  // check for image empty
+  if (!req.body.images || req.body.images.length <= 0) {
+    return next(new AppError("Atleast one image is required.", 400));
+  }
+
   // upload images to cloudinary
   const imgUrls = [];
-  for (img in req.body.images) {
-    const uploadedImg = await cloudinary.uploader.upload(img, {
-      upload_preset: "upload_service",
+  for (let i = 0; i < req.body.images.length; i++) {
+    const uploadedImg = await cloudinary.uploader.upload(req.body.images[i], {
+      upload_preset: "projectory_services",
     });
-    imgUrls.push(uploadedImg.url);
+
+    imgUrls.push(uploadedImg.public_id);
+  }
+
+  // check if imgUrls is empty
+  if (imgUrls.length <= 0) {
+    return next(new AppError("Image upload failed.", 500));
   }
 
   const service = await Services.create({

@@ -1,4 +1,5 @@
 import { Services } from "../model/servicesModel.js";
+import { Ratings } from "../model/ratingReviewsModel.js";
 
 // config
 import { cloudinary } from "../config/cloudinary.js";
@@ -77,6 +78,8 @@ export const createServices = catchAsync(async (req, res, next) => {
     ...req.body,
     images: imgUrls,
     userId,
+    userName: req.body.user.userName,
+    userImg: req.body.user.avatar,
   });
 
   return res.status(201).json({
@@ -137,8 +140,17 @@ export const deleteService = catchAsync(async (req, res, next) => {
     return next(new AppError("You do not have the permission.", 403));
   }
 
-  // delete
+  // transaction
+  const session = await Services.startSession();
+  session.startTransaction();
+
+  // delete ratings
+  await Ratings.deleteMany({ serviceId: sid });
+
+  // delete service
   await Services.findOneAndDelete({ _id: sid });
+
+  session.endSession();
 
   res.status(200).json({
     status: "success",

@@ -17,6 +17,14 @@ const servicesSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "User id is required."],
     },
+    userName: {
+      type: String,
+      required: [true, "User name is required."],
+    },
+    userImg: {
+      type: String,
+      required: [true, "User img is required."],
+    },
     category: {
       type: String,
       enum: ["web-developement", "mobile-developement", "graphics-designing"],

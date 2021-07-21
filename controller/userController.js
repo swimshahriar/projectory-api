@@ -1,10 +1,10 @@
 import { User } from "../model/userModel.js";
 
+import { cloudinary } from "../config/cloudinary.js";
+
 // error handler
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
-
-import { isAuth } from "./authController.js";
 
 // user info
 export const getUserInfo = catchAsync(async (req, res, next) => {
@@ -29,6 +29,14 @@ export const getUserInfo = catchAsync(async (req, res, next) => {
 // update user info
 export const updateUserInfo = catchAsync(async (req, res, next) => {
   const { _id: uid } = req.user;
+  if (req.user.avatar !== req.body.avatar) {
+    const response = await cloudinary.uploader.upload(req.body.avatar, {
+      upload_preset: "projectory_avatars",
+    });
+    await cloudinary.uploader.destroy(req.user.avatar);
+
+    req.body.avatar = response.public_id;
+  }
 
   const oldUserData = await User.findById(uid);
 

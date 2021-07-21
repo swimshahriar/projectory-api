@@ -110,6 +110,57 @@ export const updateServices = catchAsync(async (req, res, next) => {
     return next(new AppError("You do not have the permission.", 403));
   }
 
+  // check if images changed
+  let isImageChanged = false;
+  const isSameLength = req.body.images.length === service.images.length;
+
+  if (isSameLength) {
+    for (let i = 0; i < service.images.length; i++) {
+      if (req.body.images[i] !== service.images[i]) {
+        isImageChanged = true;
+        break;
+      }
+    }
+  }
+
+  if (isImageChanged || !isSameLength) {
+    // mongoose transaction
+    const session = await Services.startSession();
+    session.startTransaction();
+    const imgUrls = [];
+    // upload images to cloudinary
+    for (let i = 0; i < req.body.images.length; i++) {
+      const uploadedImg = await cloudinary.uploader.upload(req.body.images[i], {
+        upload_preset: "projectory_services",
+      });
+
+      imgUrls.push(uploadedImg.public_id);
+    }
+
+    // check if imgUrls is empty
+    if (imgUrls.length <= 0) {
+      return next(new AppError("Image upload failed.", 500));
+    }
+
+    // delete old images
+    for (let i = 0; i < service.images.length; i++) {
+      await cloudinary.uploader.destroy(service.images[i]);
+    }
+
+    // update
+    const updatedService = await Services.findOneAndUpdate(
+      { _id: sid },
+      { ...req.body, images: imageUrls },
+      { new: true, runValidators: true }
+    );
+    session.endSession();
+
+    return res.status(200).json({
+      status: "success",
+      services: updatedService,
+    });
+  }
+
   // update
   const updatedService = await Services.findOneAndUpdate(
     { _id: sid },
@@ -149,6 +200,10 @@ export const deleteService = catchAsync(async (req, res, next) => {
 
   // delete service
   await Services.findOneAndDelete({ _id: sid });
+
+  for (let i = 0; i < service.images.length; i++) {
+    await cloudinary.uploader.destroy(service.images[i]);
+  }
 
   session.endSession();
 

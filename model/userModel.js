@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    validate: [validator.isURL, "Please provide a photo url."],
     default: undefined,
   },
   tagLine: {
@@ -36,6 +35,15 @@ const userSchema = new mongoose.Schema({
   description: {
     type: String,
     maxlenth: 150,
+    default: undefined,
+  },
+  gender: {
+    type: String,
+    enum: ["male", "female", "others"],
+    default: undefined,
+  },
+  birthday: {
+    type: String,
     default: undefined,
   },
   languages: {

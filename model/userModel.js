@@ -4,17 +4,27 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: [true, "First name required."] },
-  lastName: { type: String, required: [true, "Last name required."] },
+  firstName: {
+    type: String,
+    trim: true,
+    required: [true, "First name required."],
+  },
+  lastName: {
+    type: String,
+    trim: true,
+    required: [true, "Last name required."],
+  },
   userName: {
     type: String,
     required: [true, "User name required."],
     unique: true,
+    trim: true,
     lowercase: true,
   },
   email: {
     type: String,
     required: [true, "Email required."],
+    trim: true,
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email."],
@@ -64,10 +74,6 @@ const userSchema = new mongoose.Schema({
     },
   ],
   skills: {
-    type: Array,
-    default: undefined,
-  },
-  services: {
     type: Array,
     default: undefined,
   },

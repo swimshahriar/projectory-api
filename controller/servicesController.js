@@ -78,8 +78,8 @@ export const createServices = catchAsync(async (req, res, next) => {
     ...req.body,
     images: imgUrls,
     userId,
-    userName: req.body.user.userName,
-    userImg: req.body.user.avatar,
+    userName: req.user.userName,
+    userImg: req.user.avatar,
   });
 
   return res.status(201).json({

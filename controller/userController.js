@@ -29,24 +29,29 @@ export const getUserInfo = catchAsync(async (req, res, next) => {
 // update user info
 export const updateUserInfo = catchAsync(async (req, res, next) => {
   const { _id: uid } = req.user;
-  if (req.user.avatar !== req.body.avatar) {
+  let newAvatar;
+  if (req.body.avatar && req.user.avatar !== req.body.avatar) {
     const response = await cloudinary.uploader.upload(req.body.avatar, {
       upload_preset: "projectory_avatars",
     });
-    await cloudinary.uploader.destroy(req.user.avatar);
 
-    req.body.avatar = response.public_id;
+    req.user.avatar && (await cloudinary.uploader.destroy(req.user.avatar));
+    newAvatar = response.public_id;
   }
 
   const oldUserData = await User.findById(uid);
 
   const newUserData = await User.findOneAndUpdate(
     { _id: uid },
-    { ...oldUserData._doc, ...req.body },
+    {
+      ...oldUserData._doc,
+      ...req.body,
+      avatar: newAvatar ? newAvatar : oldUserData.avatar,
+    },
     { new: true, runValidators: true, context: "query" }
   );
 
-  res.status(200).json({
+  return res.status(200).json({
     status: "success",
     user: newUserData,
   });

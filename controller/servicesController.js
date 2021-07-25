@@ -14,13 +14,17 @@ export const getServices = catchAsync(async (req, res, next) => {
 
   // filter query
   if (req.query.id) {
-    services = await Services.findOne({ _id: req.query.id });
+    services = await Services.findOne({ _id: req.query.id }).sort("-createdAt");
   } else if (req.query.uid) {
-    services = await Services.find({ userId: req.query.uid });
+    services = await Services.find({ userId: req.query.uid }).sort(
+      "-createdAt"
+    );
   } else if (req.query.category) {
-    services = await Services.find({ category: req.query.category });
+    services = await Services.find({ category: req.query.category }).sort(
+      "-createdAt"
+    );
   } else {
-    services = await Services.find();
+    services = await Services.find().sort("-createdAt");
   }
 
   // no services found

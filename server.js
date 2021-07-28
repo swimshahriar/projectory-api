@@ -28,11 +28,7 @@ const app = express();
 // middlewares
 app.use(logger("tiny"));
 app.use(helmet());
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "*"],
-  })
-);
+app.use(cors());
 app.use(express.json({ limit: "30mb" }));
 
 // routes

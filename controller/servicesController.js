@@ -13,8 +13,8 @@ export const getServices = catchAsync(async (req, res, next) => {
   let services;
 
   // filter query
-  if (req.query.id) {
-    services = await Services.findOne({ _id: req.query.id }).sort("-createdAt");
+  if (req.query.sid) {
+    services = await Services.findOne({ _id: req.query.sid });
   } else if (req.query.uid) {
     services = await Services.find({ userId: req.query.uid }).sort(
       "-createdAt"

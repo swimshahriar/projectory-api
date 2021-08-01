@@ -12,7 +12,7 @@ import {
 import { checkAuth } from "../middleware/checkAuth.js";
 
 // rotues
-router.get("/", checkAuth, getRatingReviews);
+router.get("/",  getRatingReviews);
 router.post("/:sid", checkAuth, createRatingReviews);
 router.delete("/:rid", checkAuth, deleteRatingReviews);
 

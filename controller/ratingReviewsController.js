@@ -57,7 +57,7 @@ export const getRatingReviews = catchAsync(async (req, res, next) => {
 
 // create rating reviews
 export const createRatingReviews = catchAsync(async (req, res, next) => {
-  const { _id: uid } = req.user;
+  const { _id: uid, userName } = req.user;
   const { sid } = req.params;
 
   // check for sid or star
@@ -74,6 +74,7 @@ export const createRatingReviews = catchAsync(async (req, res, next) => {
 
   const ratings = await Ratings.create({
     ...req.body,
+    userName,
     userId: uid,
     serviceId: sid,
   });

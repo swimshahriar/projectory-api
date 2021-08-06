@@ -1,4 +1,5 @@
 import { User } from "../model/userModel.js";
+import { Services } from "../model/servicesModel.js";
 
 import { cloudinary } from "../config/cloudinary.js";
 
@@ -37,6 +38,17 @@ export const updateUserInfo = catchAsync(async (req, res, next) => {
 
     req.user.avatar && (await cloudinary.uploader.destroy(req.user.avatar));
     newAvatar = response.public_id;
+
+    // changing services userImg
+    const services = await Services.find({ userId: uid });
+    if (services || services?.length <= 0) {
+      for (let i = 0; i < services.length; i++) {
+        await Services.findByIdAndUpdate(
+          { _id: services[i]._id },
+          { userImg: newAvatar }
+        );
+      }
+    }
   }
 
   const oldUserData = await User.findById(uid);

@@ -27,7 +27,13 @@ const servicesSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["web-developement", "mobile-developement", "graphics-designing"],
+      enum: [
+        "web-developement",
+        "mobile-developement",
+        "graphics-designing",
+        "seo",
+        "digital-marketing",
+      ],
       required: [true, "Category is required."],
     },
     rating: {

@@ -19,7 +19,7 @@ export const createJob = CatchAsync(async (req, res, next) => {
 
 // get jobs
 export const getJobs = CatchAsync(async (req, res, next) => {
-  const { uid, status } = req.params;
+  const { uid, status } = req.query;
 
   let jobs;
 
@@ -36,4 +36,27 @@ export const getJobs = CatchAsync(async (req, res, next) => {
   return res
     .status(200)
     .json({ status: "success", length: jobs.length || 0, jobs });
+});
+
+// delete jobs
+export const deleteJobs = CatchAsync(async (req, res, next) => {
+  const { _id: userId } = req.user;
+  const { jid } = req.params;
+
+  const job = await Jobs.findById(jid);
+  console.log(job);
+
+  if (!job || job?.length <= 0) {
+    return res
+      .status(404)
+      .json({ status: "failed", message: "No job found with this id." });
+  }
+
+  if (job.userId.toString() !== userId.toString()) {
+    return next(new AppError("Not authorized.", 401));
+  }
+
+  await Jobs.findOneAndDelete({ _id: jid });
+
+  return res.status(200).json({ status: "success" });
 });

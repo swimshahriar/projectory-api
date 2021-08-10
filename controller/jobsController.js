@@ -32,7 +32,10 @@ export const getJobs = CatchAsync(async (req, res, next) => {
   } else if (jid) {
     jobs = await Jobs.find({ _id: jid }).sort("-createdAt");
   } else {
-    jobs = await Jobs.find().sort("-createdAt");
+    jobs = await Jobs.find()
+      .where("status")
+      .equals("public")
+      .sort("-createdAt");
   }
 
   return res

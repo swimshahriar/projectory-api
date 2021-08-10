@@ -23,8 +23,8 @@ const jobsSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "web-developement",
-        "mobile-developement",
+        "web-development",
+        "mobile-development",
         "graphics-designing",
         "seo",
         "digital-marketing",
@@ -46,7 +46,6 @@ const jobsSchema = new mongoose.Schema(
     },
     userImg: {
       type: String,
-      required: [true, "User img is required."],
     },
   },
   { timestamps: true }

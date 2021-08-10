@@ -6,6 +6,7 @@ import {
   createJob,
   getJobs,
   deleteJobs,
+  updateJob,
 } from "../controller/jobsController.js";
 
 const router = Router();
@@ -14,6 +15,7 @@ const router = Router();
 router.post("/", checkAuth, createJob);
 router.get("/", getJobs);
 router.delete("/:jid", checkAuth, deleteJobs);
+router.patch("/:jid", checkAuth, updateJob);
 
 // export
 export const jobsRoutes = router;

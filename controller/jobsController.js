@@ -10,7 +10,7 @@ export const createJob = CatchAsync(async (req, res, next) => {
   const jobs = await Jobs.create({
     ...req.body,
     userId,
-    userImg,
+    userImg: userImg || undefined,
     userName,
   });
 
@@ -19,7 +19,7 @@ export const createJob = CatchAsync(async (req, res, next) => {
 
 // get jobs
 export const getJobs = CatchAsync(async (req, res, next) => {
-  const { uid, status } = req.query;
+  const { uid, status, jid } = req.query;
 
   let jobs;
 
@@ -29,6 +29,8 @@ export const getJobs = CatchAsync(async (req, res, next) => {
     jobs = await Jobs.find({ status }).sort("-createdAt");
   } else if (uid && status) {
     jobs = await Jobs.find({ userId: uid, status }).sort("-createdAt");
+  } else if (jid) {
+    jobs = await Jobs.find({ _id: jid }).sort("-createdAt");
   } else {
     jobs = await Jobs.find().sort("-createdAt");
   }
@@ -47,9 +49,7 @@ export const deleteJobs = CatchAsync(async (req, res, next) => {
   console.log(job);
 
   if (!job || job?.length <= 0) {
-    return res
-      .status(404)
-      .json({ status: "failed", message: "No job found with this id." });
+    return next(new AppError("No job found with this id.", 404));
   }
 
   if (job.userId.toString() !== userId.toString()) {
@@ -59,4 +59,36 @@ export const deleteJobs = CatchAsync(async (req, res, next) => {
   await Jobs.findOneAndDelete({ _id: jid });
 
   return res.status(200).json({ status: "success" });
+});
+
+// update job
+export const updateJob = CatchAsync(async (req, res, next) => {
+  const { _id: userId } = req.user;
+  const { jid } = req.params;
+
+  const job = await Jobs.findById(jid);
+
+  if (!job) {
+    return next(new AppError("No job found with this id.", 404));
+  }
+
+  if (
+    userId.toString() !== job.userId.toString() &&
+    req.user.role !== "admin"
+  ) {
+    return next(new AppError("You are not authorized.", 401));
+  }
+
+  // if req.body is empty
+  if (!Object.keys(req.body).length) {
+    return next(new AppError("Req body cannot be empty.", 400));
+  }
+
+  const updatedJob = await Jobs.findOneAndUpdate(
+    { _id: jid },
+    { ...req.body },
+    { new: true }
+  );
+
+  return res.status(200).json({ status: "success", jobs: [updatedJob] });
 });

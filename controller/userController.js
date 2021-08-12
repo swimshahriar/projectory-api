@@ -1,5 +1,6 @@
 import { User } from "../model/userModel.js";
 import { Services } from "../model/servicesModel.js";
+import { Jobs } from "../model/jobsModel.js";
 
 import { cloudinary } from "../config/cloudinary.js";
 
@@ -45,6 +46,17 @@ export const updateUserInfo = catchAsync(async (req, res, next) => {
       for (let i = 0; i < services.length; i++) {
         await Services.findByIdAndUpdate(
           { _id: services[i]._id },
+          { userImg: newAvatar }
+        );
+      }
+    }
+
+    // changing jobs userImg
+    const jobs = await Jobs.find({ userId: uid });
+    if (jobs || jobs?.length <= 0) {
+      for (let i = 0; i < jobs.length; i++) {
+        await Jobs.findByIdAndUpdate(
+          { _id: jobs[i]._id },
           { userImg: newAvatar }
         );
       }

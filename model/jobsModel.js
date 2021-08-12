@@ -36,6 +36,10 @@ const jobsSchema = new mongoose.Schema(
       default: "public",
       enum: ["public", "active", "finished", "canceled"],
     },
+    skills: {
+      type: Array,
+      required: [true, "Atleast one skill is required."],
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "User id is required."],

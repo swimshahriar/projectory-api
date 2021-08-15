@@ -20,6 +20,7 @@ import { userRoutes } from "./routes/userRoutes.js";
 import { servicesRoutes } from "./routes/servicesRoutes.js";
 import { ratingReviewsRoutes } from "./routes/ratingReviewsRoutes.js";
 import { jobsRoutes } from "./routes/jobsRoutes.js";
+import { skillTestRoutes } from "./routes/skillTestRoutes.js";
 
 // env variable
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/rating-review", ratingReviewsRoutes);
+app.use("/api/skill-test", skillTestRoutes);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on this server!`, 404));

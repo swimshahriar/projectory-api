@@ -20,16 +20,17 @@ export const getFavoriteServices = catchAsync(async (req, res, next) => {
   }
 
   // fetching each service info + storing in an array
-  const favServies = [];
+  const favServices = [];
+  favoriteServices.reverse();
   for (let i = 0; i < favoriteServices.length; i++) {
     const serviceInfo = await Services.findById(favoriteServices[i]);
-    favServies.push(serviceInfo);
+    favServices.push(serviceInfo);
   }
 
   return res.status(200).json({
     status: "success",
-    length: favServies.length,
-    services: favServies,
+    length: favServices.length,
+    services: favServices,
   });
 });
 
@@ -66,6 +67,7 @@ export const addFavoriteService = catchAsync(async (req, res, next) => {
 
   // fetching each service info + storing in an array
   const favServices = [];
+  newfavoriteServices.reverse();
   for (let i = 0; i < newfavoriteServices.length; i++) {
     const serviceInfo = await Services.findById(newfavoriteServices[i]);
     favServices.push(serviceInfo);

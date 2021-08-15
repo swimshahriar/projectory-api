@@ -49,7 +49,6 @@ export const deleteJobs = CatchAsync(async (req, res, next) => {
   const { jid } = req.params;
 
   const job = await Jobs.findById(jid);
-  console.log(job);
 
   if (!job || job?.length <= 0) {
     return next(new AppError("No job found with this id.", 404));
@@ -57,6 +56,10 @@ export const deleteJobs = CatchAsync(async (req, res, next) => {
 
   if (job.userId.toString() !== userId.toString()) {
     return next(new AppError("Not authorized.", 401));
+  }
+
+  if (job.status !== "public") {
+    return next(new AppError("Job is not in public status.", 400));
   }
 
   await Jobs.findOneAndDelete({ _id: jid });

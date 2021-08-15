@@ -2,7 +2,7 @@
   "name": "projectory-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "NODE_ENV=production node server.js",

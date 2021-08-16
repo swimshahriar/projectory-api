@@ -16,7 +16,7 @@ export const getSkillTests = CatchAsync(async (req, res, next) => {
 
   return res.status(200).json({
     status: "success",
-    skillTests: skillTests ? Array(skillTests) : [],
+    skillTests: skillTests,
   });
 });
 

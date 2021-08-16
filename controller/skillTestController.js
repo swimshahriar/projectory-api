@@ -5,7 +5,19 @@ import AppError from "../utils/appError.js";
 
 // ------------------ get skill tests ------------------
 export const getSkillTests = CatchAsync(async (req, res, next) => {
-  return res.status(200).json({ status: "success" });
+  const { tid } = req.query;
+
+  let skillTests;
+  if (tid) {
+    skillTests = await SkillTests.findById({ _id: tid });
+  } else {
+    skillTests = await SkillTests.find().sort("-createdAt");
+  }
+
+  return res.status(200).json({
+    status: "success",
+    skillTests: skillTests ? Array(skillTests) : [],
+  });
 });
 
 // ------------------ create skill test -----------------

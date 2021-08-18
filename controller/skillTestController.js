@@ -6,9 +6,14 @@ import AppError from "../utils/appError.js";
 // ------------------ get skill tests ------------------
 export const getSkillTests = CatchAsync(async (req, res, next) => {
   const { tid } = req.query;
+  const { role } = req.user;
 
   let skillTests;
-  if (tid) {
+  if (tid && role === "user") {
+    skillTests = await SkillTests.findById({ _id: tid }).select("-answers");
+  } else if (!tid && role === "user") {
+    skillTests = await SkillTests.find().select("-answers").sort("-createdAt");
+  } else if (tid && role === "admin") {
     skillTests = await SkillTests.findById({ _id: tid });
   } else {
     skillTests = await SkillTests.find().sort("-createdAt");

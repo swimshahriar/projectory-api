@@ -18,7 +18,7 @@ const router = Router();
 // routes
 router.get("/", checkAuth, getSkillTestResults);
 router.post(
-  "/",
+  "/:tid",
   checkAuth,
   restrictTo("user"),
   giveSkillTestValidateRules(),

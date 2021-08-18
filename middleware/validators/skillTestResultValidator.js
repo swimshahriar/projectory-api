@@ -3,10 +3,7 @@ import AppError from "../../utils/appError.js";
 
 // -------------- rules -------------
 export const giveSkillTestValidateRules = () => {
-  return [
-    body("tid").isString().notEmpty(),
-    body("answers").isObject().notEmpty(),
-  ];
+  return [body("answers").isObject().notEmpty()];
 };
 
 // ------------------ validate results ---------------

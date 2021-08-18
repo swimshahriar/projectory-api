@@ -28,12 +28,19 @@ export const giveSkillTest = catchAsync(async (req, res, next) => {
   const totalQuestions = Object.keys(skillTest.questions).length;
   const percent = parseFloat(((score / totalQuestions) * 100).toFixed(2));
 
+  // check for pass mark
+  let pass = false;
+  if (percent >= 80) {
+    pass = true;
+  }
+
   // save skill test result
   const skillTestResult = new SkillTestResults({
     tid,
     answers,
     score,
     percent,
+    pass,
     userId,
   });
   await skillTestResult.save();

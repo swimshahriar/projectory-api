@@ -22,6 +22,10 @@ const skillTestResultSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Percent is required."],
     },
+    pass: {
+      type: Boolean,
+      required: [true, "Pass required."],
+    },
   },
   { timestamps: true }
 );

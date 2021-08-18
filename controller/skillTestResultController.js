@@ -72,4 +72,19 @@ export const getSkillTestResults = catchAsync(async (req, res, next) => {
 });
 
 // -------------------- delete skill test result ---------------
-export const deleteSkillTestResult = catchAsync(async (req, res, next) => {});
+export const deleteSkillTestResult = catchAsync(async (req, res, next) => {
+  const { trid } = req.params;
+
+  // check if test result exists
+  const skillTestResult = await SkillTestResults.findById(trid);
+  if (!skillTestResult) {
+    return next(new AppError("No test result found with this id.", 404));
+  }
+
+  // delete result
+  await SkillTestResults.findByIdAndDelete(trid);
+
+  return res.status(200).json({
+    status: "success",
+  });
+});

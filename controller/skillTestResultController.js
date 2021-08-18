@@ -49,7 +49,27 @@ export const giveSkillTest = catchAsync(async (req, res, next) => {
 });
 
 // -------------------- get skill test results -----------------
-export const getSkillTestResults = catchAsync(async (req, res, next) => {});
+export const getSkillTestResults = catchAsync(async (req, res, next) => {
+  const { uid, tid, trid } = req.query;
+
+  let skillTestResult;
+  if (uid) {
+    skillTestResult = await SkillTestResults.find({ userId: uid }).sort(
+      "-createdAt"
+    );
+  } else if (tid) {
+    skillTestResult = await SkillTestResults.find({ tid }).sort("-createdAt");
+  } else if (trid) {
+    skillTestResult = await SkillTestResults.findById(trid);
+  } else {
+    skillTestResult = await SkillTestResults.find().sort("-createdAt");
+  }
+
+  return res.status(200).json({
+    status: "success",
+    skillTestResult,
+  });
+});
 
 // -------------------- delete skill test result ---------------
 export const deleteSkillTestResult = catchAsync(async (req, res, next) => {});

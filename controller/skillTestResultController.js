@@ -16,6 +16,12 @@ export const giveSkillTest = catchAsync(async (req, res, next) => {
     return next(new AppError("No skill test found with this id.", 404));
   }
 
+  // delete previous test result, if any
+  await SkillTestResults.findOneAndDelete({
+    tid,
+    userId,
+  });
+
   // check for answers
   let score = 0;
   for (let ans in answers) {

@@ -6,6 +6,14 @@ const skillTestResultSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: [true, "Test id is required."],
     },
+    title: {
+      type: String,
+      required: [true, "Title is required."],
+    },
+    questions: {
+      type: Object,
+      required: [true, "Questions are required."],
+    },
     answers: {
       type: Object,
       required: [true, "Answers are required."],

@@ -43,6 +43,8 @@ export const giveSkillTest = catchAsync(async (req, res, next) => {
   // save skill test result
   const skillTestResult = new SkillTestResults({
     tid,
+    title: skillTest.title,
+    questions: skillTest.questions,
     answers,
     score,
     percent,

@@ -1,4 +1,6 @@
+import http from "http";
 import express from "express";
+import { Server } from "socket.io";
 import mongoose from "mongoose";
 import cors from "cors";
 import helmet from "helmet";
@@ -23,10 +25,21 @@ import { jobsRoutes } from "./routes/jobsRoutes.js";
 import { skillTestRoutes } from "./routes/skillTestRoutes.js";
 import { skillTestResultRoutes } from "./routes/skillTestResultRoutes.js";
 
-// env variable
+// express, http server, env variables
+const app = express();
+const server = http.createServer(app);
 dotenv.config();
 
-const app = express();
+// socket creation
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+global.io = io;
+global.io.on("connection", () => {
+  console.log("user connected!");
+});
 
 // middlewares
 app.use(logger("tiny"));
@@ -50,7 +63,7 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 // server connect
-let server;
+
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -60,7 +73,7 @@ mongoose
   })
   .then(() => {
     console.log("DB Connected!");
-    server = app.listen(process.env.PORT || 8000, () =>
+    server.listen(process.env.PORT || 8000, () =>
       console.log("Server Started.")
     );
   });

@@ -23,13 +23,18 @@ export const createConversation = catchAsync(async (req, res, next) => {
 
   //check if already conversation exist
   const isExist = await Conversations.findOne({
-    members: { $all: [senderId, receiverId] },
+    members: {
+      $all: [
+        mongoose.Types.ObjectId(senderId),
+        mongoose.Types.ObjectId(receiverId),
+      ],
+    },
   });
 
   if (isExist) {
-    return res.status(400).json({
-      status: "fail",
-      message: "Conversation already exist.",
+    return res.status(200).json({
+      status: "success",
+      cid: isExist._id,
     });
   }
 
@@ -38,19 +43,14 @@ export const createConversation = catchAsync(async (req, res, next) => {
   const recUser = await User.findById(recieverIdObj);
 
   // create new conversations
-  const newConversations = new Conversations({
+  const conversations = new Conversations({
     members: [senderId, recieverIdObj],
     userName: {
       [senderId]: userName,
       [receiverId]: recUser.userName,
     },
   });
-  await newConversations.save();
-
-  // get all the conversations
-  const conversations = await Conversations.find({
-    members: { $in: [senderId] },
-  }).sort("-createdAt");
+  await conversations.save();
 
   return res.status(201).json({
     status: "success",

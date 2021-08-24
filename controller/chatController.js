@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 // internal imports
 import { Conversations, Messages } from "../model/chatsModel.js";
+import { User } from "../model/userModel.js";
 import catchAsync from "../utils/catchAsync.js";
 
 // ----------------- get conversations ----------------
@@ -16,7 +18,7 @@ export const getConversations = catchAsync(async (req, res, next) => {
 
 // ------------------- create conversation ------------------
 export const createConversation = catchAsync(async (req, res, next) => {
-  const { _id: senderId } = req.user;
+  const { _id: senderId, userName } = req.user;
   const { receiverId } = req.params;
 
   //check if already conversation exist
@@ -31,9 +33,17 @@ export const createConversation = catchAsync(async (req, res, next) => {
     });
   }
 
+  // get userName of the recieverId
+  const recieverIdObj = mongoose.Types.ObjectId(receiverId);
+  const recUser = await User.findById(recieverIdObj);
+
   // create new conversations
   const newConversations = new Conversations({
-    members: [senderId, receiverId],
+    members: [senderId, recieverIdObj],
+    userName: {
+      [senderId]: userName,
+      [receiverId]: recUser.userName,
+    },
   });
   await newConversations.save();
 
@@ -62,6 +72,10 @@ export const newMessage = catchAsync(async (req, res, next) => {
       message: "Wrong conversation id.",
     });
   }
+
+  // update conversation
+  isExist.lastMsg = text;
+  await isExist.save();
 
   // save new msg
   const messages = new Messages({

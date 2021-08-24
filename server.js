@@ -37,7 +37,6 @@ const io = new Server(server, {
     origin: "*",
   },
 });
-global.io = io;
 
 // ---------------------- socket functions --------------------------
 let users = [];
@@ -57,21 +56,30 @@ const getUser = (userId) => {
 };
 
 // ------------------ socket connection -----------------
-global.io.on("connection", (socket) => {
+io.on("connection", (socket) => {
   // on connect
   console.log("new user connected!");
 
   // take user and socket id from user
   socket.on("addUser", (userId) => {
     addUser(userId, socket.id);
-    global.io.emit("getUsers", users);
+    io.emit("getUsers", users);
+  });
+
+  //send and get message
+  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+    const user = getUser(receiverId);
+    io.to(user.socketId).emit("getMessage", {
+      senderId,
+      text,
+    });
   });
 
   // on disconnect remove user
   socket.on("disconnect", () => {
     console.log("a user left!");
     removeUser(socket.id);
-    global.io.emit("getUsers", users);
+    io.emit("getUsers", users);
   });
 });
 

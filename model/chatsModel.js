@@ -7,6 +7,9 @@ const ConversationSchema = new mongoose.Schema(
       type: Array,
       required: [true, "Members needed."],
     },
+    userName: {
+      type: Object,
+    },
     lastMsg: String,
   },
   { timestamps: true }

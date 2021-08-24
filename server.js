@@ -24,6 +24,7 @@ import { ratingReviewsRoutes } from "./routes/ratingReviewsRoutes.js";
 import { jobsRoutes } from "./routes/jobsRoutes.js";
 import { skillTestRoutes } from "./routes/skillTestRoutes.js";
 import { skillTestResultRoutes } from "./routes/skillTestResultRoutes.js";
+import { chatsRoutes } from "./routes/chatsRoutes.js";
 
 // express, http server, env variables
 const app = express();
@@ -37,8 +38,41 @@ const io = new Server(server, {
   },
 });
 global.io = io;
-global.io.on("connection", () => {
-  console.log("user connected!");
+
+// ---------------------- socket functions --------------------------
+let users = [];
+
+// ------------------- helper functions --------------
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
+
+// ------------------ socket connection -----------------
+global.io.on("connection", (socket) => {
+  // on connect
+  console.log("new user connected!");
+
+  // take user and socket id from user
+  socket.on("addUser", (userId) => {
+    addUser(userId, socket.id);
+    global.io.emit("getUsers", users);
+  });
+
+  // on disconnect remove user
+  socket.on("disconnect", () => {
+    console.log("a user left!");
+    removeUser(socket.id);
+    global.io.emit("getUsers", users);
+  });
 });
 
 // middlewares
@@ -54,6 +88,7 @@ app.use("/api/jobs", jobsRoutes);
 app.use("/api/rating-review", ratingReviewsRoutes);
 app.use("/api/skill-test", skillTestRoutes);
 app.use("/api/skill-test-result", skillTestResultRoutes);
+app.use("/api/chats", chatsRoutes);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on this server!`, 404));

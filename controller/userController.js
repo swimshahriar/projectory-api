@@ -70,6 +70,7 @@ export const updateUserInfo = catchAsync(async (req, res, next) => {
     {
       ...oldUserData._doc,
       ...req.body,
+      role: "user",
       avatar: newAvatar ? newAvatar : oldUserData.avatar,
     },
     { new: true, runValidators: true, context: "query" }

@@ -40,10 +40,10 @@ export const registerHandler = catchAsync(async (req, res, next) => {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
-    userName: req.body.userName,
+    userName: req.body.userName.trim().replace(/ /g, "").toLowerCase(),
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    role: req.body.role,
+    role: "user",
   });
 
   createSendToken(newUser, 201, res);

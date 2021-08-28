@@ -14,9 +14,9 @@ const router = Router();
 
 // routes
 router.get("/", checkAuth, getSkillTests);
-router.post("/", checkAuth, restrictTo("user"), createSkillTest);
-router.patch("/:tid", checkAuth, restrictTo("user"), updateSkillTest);
-router.delete("/:tid", checkAuth, restrictTo("user"), deleteSkillTest);
+router.post("/", checkAuth, restrictTo("admin"), createSkillTest);
+router.patch("/:tid", checkAuth, restrictTo("admin"), updateSkillTest);
+router.delete("/:tid", checkAuth, restrictTo("admin"), deleteSkillTest);
 
 // export
 export const skillTestRoutes = router;

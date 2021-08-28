@@ -25,6 +25,7 @@ import { jobsRoutes } from "./routes/jobsRoutes.js";
 import { skillTestRoutes } from "./routes/skillTestRoutes.js";
 import { skillTestResultRoutes } from "./routes/skillTestResultRoutes.js";
 import { chatsRoutes } from "./routes/chatsRoutes.js";
+import { siteSettingsRoutes } from "./routes/siteSettingsRoutes.js";
 
 // express, http server, env variables
 const app = express();
@@ -97,6 +98,7 @@ app.use("/api/rating-review", ratingReviewsRoutes);
 app.use("/api/skill-test", skillTestRoutes);
 app.use("/api/skill-test-result", skillTestResultRoutes);
 app.use("/api/chats", chatsRoutes);
+app.use("/api/site-settings", siteSettingsRoutes);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`cannot find ${req.originalUrl} on this server!`, 404));

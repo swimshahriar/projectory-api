@@ -41,3 +41,24 @@ export const createOrder = catchAsync(async (req, res, next) => {
     orders,
   });
 });
+
+// ----------------------- get orders --------------------
+export const getOrders = catchAsync(async (req, res, next) => {
+  const { oid, reqUid, recUid } = req.query;
+
+  let orders;
+  if (oid) {
+    orders = await Orders.findById(oid);
+  } else if (reqUid) {
+    orders = await Orders.find({ reqPersonId: reqUid }).sort("-updatedAt");
+  } else if (recUid) {
+    orders = await Orders.find({ recPersonId: recUid }).sort("-updatedAt");
+  } else {
+    orders = await Orders.find().sort("-updatedAt");
+  }
+
+  return res.status(200).json({
+    status: "success",
+    orders,
+  });
+});

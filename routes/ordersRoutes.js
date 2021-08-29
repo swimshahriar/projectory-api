@@ -4,6 +4,7 @@ import { Router } from "express";
 import {
   createOrder,
   deleteOrder,
+  finishedOrder,
   getOrders,
   updateOrder,
 } from "../controller/ordersController.js";
@@ -18,6 +19,7 @@ const router = Router();
 router.get("/", checkAuth, getOrders);
 router.post("/", ordersValidateRules(), validate, checkAuth, createOrder);
 router.patch("/:oid", checkAuth, updateOrder);
+router.patch("/finished/:oid", checkAuth, finishedOrder);
 router.delete("/:oid", checkAuth, restrictTo(["admin"]), deleteOrder);
 
 // exports

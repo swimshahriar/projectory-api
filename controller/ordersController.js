@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { Jobs } from "../model/jobsModel.js";
 import { Orders } from "../model/ordersModel.js";
 import { Services } from "../model/servicesModel.js";
+import { User } from "../model/userModel.js";
+import { SiteSettings } from "../model/siteSettingsModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 
@@ -105,4 +107,96 @@ export const deleteOrder = catchAsync(async (req, res, next) => {
   await Orders.findOneAndDelete({ _id: oid });
 
   return res.status(200).json({ status: "success" });
+});
+
+// ----------------------- finished order ---------------------
+export const finishedOrder = catchAsync(async (req, res, next) => {
+  const { oid } = req.params;
+  const { _id: uid } = req.user;
+
+  // check if user is the reqPerson
+  const order = await Orders.findById(oid);
+  if (order.reqPersonId.toString() !== uid.toString()) {
+    return next(new AppError("You are not authorized.", 401));
+  }
+
+  // check if order already finished
+  if (order.status === "finished") {
+    return next(new AppError("Order is already finished.", 400));
+  }
+
+  // fetch reqPerson info
+  const reqPerson = await User.findById(order.reqPersonId);
+
+  // fetch recPerson info
+  const recPerson = await User.findById(order.recPersonId);
+
+  // check if buyer has enough money
+  let hasEnoughMoney = true;
+  if (order.type === "services" && reqPerson.balance < order.price) {
+    hasEnoughMoney = false;
+  } else if (order.type === "jobs" && recPerson.balance < order.price) {
+    hasEnoughMoney = false;
+  }
+
+  if (!hasEnoughMoney) {
+    return next(
+      new AppError(
+        "You don't have enough balance to finish this service/job.",
+        400
+      )
+    );
+  }
+
+  // fetch site settings
+  const siteSettings = await SiteSettings.find();
+  const { commission } = siteSettings[0];
+
+  const commissionMoney = parseFloat((commission / 100) * order.price);
+  const sellerMoney = parseFloat(order.price - commissionMoney);
+
+  // add, sub balance then save
+  let buyerMoney;
+  if (order.type === "services") {
+    buyerMoney = parseFloat(reqPerson.balance - order.price);
+    await User.findOneAndUpdate(
+      { _id: reqPerson._id },
+      { balance: buyerMoney }
+    );
+    const newSellerMoney = parseFloat(recPerson.balance + sellerMoney);
+    await User.findOneAndUpdate(
+      { _id: recPerson._id },
+      { balance: newSellerMoney }
+    );
+  } else if (order.type === "jobs") {
+    buyerMoney = parseFloat(recPerson.balance - order.price);
+    await User.findOneAndUpdate(
+      { _id: recPerson._id },
+      { balance: buyerMoney }
+    );
+
+    const newSellerMoney = parseFloat(reqPerson.balance + sellerMoney);
+    await User.findOneAndUpdate(
+      { _id: reqPerson._id },
+      { balance: newSellerMoney }
+    );
+  }
+
+  // fetch admin info
+  const admin = await User.findOne({ role: "admin" });
+  // add commission to the admin account
+  const newAdminMoney = parseFloat(admin.balance + commissionMoney);
+  await User.findOneAndUpdate({ role: "admin" }, { balance: newAdminMoney });
+
+  // update order status
+  const orders = await Orders.findOneAndUpdate(
+    { _id: oid },
+    { status: "finished", finishedDate: req.body.finishedDate },
+    { new: true }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    orders,
+  });
 });

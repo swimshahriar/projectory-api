@@ -35,7 +35,6 @@ const userSchema = new mongoose.Schema({
   },
   tagLine: {
     type: String,
-    maxlenth: 50,
     default: undefined,
   },
   location: {
@@ -44,12 +43,11 @@ const userSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    maxlenth: 150,
     default: undefined,
   },
   gender: {
     type: String,
-    enum: ["male", "female", "others"],
+    enum: ["male", "female", "others", undefined],
     default: undefined,
   },
   birthday: {
@@ -90,6 +88,16 @@ const userSchema = new mongoose.Schema({
     enum: ["user"],
     default: "user",
   },
+  balance: {
+    type: Number,
+    default: 0,
+  },
+  spent: {
+    type: Number,
+    default: 0,
+  },
+  lastTopUp: Object,
+  lastWithdraw: Object,
   password: {
     type: String,
     required: [true, "Password required."],

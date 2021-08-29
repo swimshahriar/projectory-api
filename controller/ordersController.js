@@ -63,6 +63,34 @@ export const getOrders = catchAsync(async (req, res, next) => {
   });
 });
 
+// ----------------------- update order --------------------
+export const updateOrder = catchAsync(async (req, res, next) => {
+  const { _id: uid, role } = req.user;
+  const { oid } = req.params;
+
+  // check if user is authorized
+  const order = await Orders.findById(oid);
+  if (
+    order.reqPersonId !== uid &&
+    order.recPersonId !== uid &&
+    role !== "admin"
+  ) {
+    return next(new AppError("You are not authorized to change info.", 401));
+  }
+
+  // update orders
+  const orders = await Orders.findByIdAndUpdate(
+    oid,
+    { ...req.body },
+    { new: true }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    orders,
+  });
+});
+
 // ----------------------- delete order --------------------
 export const deleteOrder = catchAsync(async (req, res, next) => {
   const { oid } = req.params;
@@ -74,7 +102,7 @@ export const deleteOrder = catchAsync(async (req, res, next) => {
   }
 
   // delete order
-  await Orders.findByIdAndDelete(oid);
+  await Orders.findOneAndDelete({ _id: oid });
 
   return res.status(200).json({ status: "success" });
 });

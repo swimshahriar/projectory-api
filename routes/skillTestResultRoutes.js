@@ -8,10 +8,8 @@ import {
 } from "../controller/skillTestResultController.js";
 import { checkAuth } from "../middleware/checkAuth.js";
 import { restrictTo } from "../middleware/restrictTo.js";
-import {
-  validate,
-  giveSkillTestValidateRules,
-} from "../middleware/validators/skillTestResultValidator.js";
+import { giveSkillTestValidateRules } from "../middleware/validators/skillTestResultValidator.js";
+import { validate } from "../middleware/validators/validateResult.js";
 
 const router = Router();
 

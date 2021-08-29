@@ -8,10 +8,8 @@ import {
   getMessages,
 } from "../controller/chatController.js";
 import { checkAuth } from "../middleware/checkAuth.js";
-import {
-  chatsValidateRules,
-  validate,
-} from "../middleware/validators/chatsValidator.js";
+import { chatsValidateRules } from "../middleware/validators/chatsValidator.js";
+import { validate } from "../middleware/validators/validateResult.js";
 
 const router = Router();
 

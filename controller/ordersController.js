@@ -62,3 +62,19 @@ export const getOrders = catchAsync(async (req, res, next) => {
     orders,
   });
 });
+
+// ----------------------- delete order --------------------
+export const deleteOrder = catchAsync(async (req, res, next) => {
+  const { oid } = req.params;
+
+  // check if order exist
+  const isOrderExist = await Orders.findById(oid);
+  if (!isOrderExist) {
+    return next(new AppError("No order found with this id.", 404));
+  }
+
+  // delete order
+  await Orders.findByIdAndDelete(oid);
+
+  return res.status(200).json({ status: "success" });
+});

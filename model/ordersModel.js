@@ -21,9 +21,22 @@ const orderSchema = new mongoose.Schema(
     jobId: {
       type: mongoose.Types.ObjectId,
     },
+    title: {
+      type: String,
+      required: [true, "Title is required."],
+    },
+    package: String,
     price: {
       type: Number,
       required: [true, "Price is required."],
+    },
+    duration: {
+      type: Number,
+      required: [true, "Duration is required."],
+    },
+    features: {
+      type: Array,
+      required: [true, "Features required."],
     },
     reqPersonId: {
       type: mongoose.Types.ObjectId,

@@ -51,6 +51,10 @@ const jobsSchema = new mongoose.Schema(
     userImg: {
       type: String,
     },
+    applicants: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

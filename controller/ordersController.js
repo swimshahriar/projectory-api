@@ -25,6 +25,12 @@ export const createOrder = catchAsync(async (req, res, next) => {
     return next(new AppError("Service or Job id is not valid.", 400));
   }
 
+  // increase the applicants count for job order
+  if (jobId) {
+    isValidId.applicants += 1;
+    await isValidId.save();
+  }
+
   // generate order id
   const id = crypto.randomBytes(3).toString("hex");
 
@@ -46,17 +52,21 @@ export const createOrder = catchAsync(async (req, res, next) => {
 
 // ----------------------- get orders --------------------
 export const getOrders = catchAsync(async (req, res, next) => {
-  const { oid, reqUid, recUid } = req.query;
+  const { oid, reqUid, recUid, type } = req.query;
 
   let orders;
   if (oid) {
     orders = await Orders.findById(oid);
   } else if (reqUid) {
-    orders = await Orders.find({ reqPersonId: reqUid }).sort("-updatedAt");
+    orders = await Orders.find({ reqPersonId: reqUid, type }).sort(
+      "-updatedAt"
+    );
   } else if (recUid) {
-    orders = await Orders.find({ recPersonId: recUid }).sort("-updatedAt");
+    orders = await Orders.find({ recPersonId: recUid, type }).sort(
+      "-updatedAt"
+    );
   } else {
-    orders = await Orders.find().sort("-updatedAt");
+    orders = await Orders.find({ type }).sort("-updatedAt");
   }
 
   return res.status(200).json({

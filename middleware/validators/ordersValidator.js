@@ -8,5 +8,7 @@ export const ordersValidateRules = () => {
     body("recPersonUserName").isString().notEmpty(),
     body("brief").isString().notEmpty(),
     body("type").isString().notEmpty(),
+    body("title").isString().notEmpty(),
+    body("duration").isNumeric().notEmpty(),
   ];
 };

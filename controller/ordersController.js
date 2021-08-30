@@ -83,8 +83,8 @@ export const updateOrder = catchAsync(async (req, res, next) => {
   // check if user is authorized
   const order = await Orders.findById(oid);
   if (
-    order.reqPersonId !== uid &&
-    order.recPersonId !== uid &&
+    order.reqPersonId.toString() !== uid.toString() &&
+    order.recPersonId.toString() !== uid.toString() &&
     role !== "admin"
   ) {
     return next(new AppError("You are not authorized to change info.", 401));
@@ -201,7 +201,7 @@ export const finishedOrder = catchAsync(async (req, res, next) => {
   // update order status
   const orders = await Orders.findOneAndUpdate(
     { _id: oid },
-    { status: "finished", finishedDate: req.body.finishedDate },
+    { status: "finished", finishedDate: req.body.finishedDate, sellerMoney },
     { new: true }
   );
 

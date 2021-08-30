@@ -80,6 +80,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: [true, "Brief is required."],
     },
+    sellerMoney: Number,
   },
   { timestamps: true }
 );

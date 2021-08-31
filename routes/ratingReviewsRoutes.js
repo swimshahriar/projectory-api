@@ -10,10 +10,18 @@ import {
 
 // middlewares
 import { checkAuth } from "../middleware/checkAuth.js";
+import { ratingValidateRules } from "../middleware/validators/ratingValidator.js";
+import { validate } from "../middleware/validators/validateResult.js";
 
 // rotues
-router.get("/",  getRatingReviews);
-router.post("/:sid", checkAuth, createRatingReviews);
+router.get("/", getRatingReviews);
+router.post(
+  "/:sid",
+  ratingValidateRules(),
+  validate,
+  checkAuth,
+  createRatingReviews
+);
 router.delete("/:rid", checkAuth, deleteRatingReviews);
 
 // exports

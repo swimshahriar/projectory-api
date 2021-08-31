@@ -9,7 +9,6 @@ const ratingReviewsSchema = new mongoose.Schema(
     },
     review: {
       type: String,
-      maxlength: 100,
       default: undefined,
     },
     userName: {
@@ -19,6 +18,10 @@ const ratingReviewsSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "User id is required."],
+    },
+    orderId: {
+      type: String,
+      required: [true, "Order id required."],
     },
     serviceId: {
       type: mongoose.Schema.Types.ObjectId,

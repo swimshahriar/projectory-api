@@ -38,19 +38,16 @@ export const getRatingReviews = catchAsync(async (req, res, next) => {
     }
   } else if (query.uid) {
     ratings = await Ratings.find({ userId: query.uid }).sort("-createdAt");
+  } else if (query.oid) {
+    ratings = await Ratings.findOne({ orderId: query.oid }).sort("-createdAt");
   } else {
     ratings = await Ratings.find().sort("-createdAt");
   }
 
-  if (!ratings) {
-    return next(
-      new AppError("Wrong query id or no ratings related with that id.", 404)
-    );
-  }
 
   res.status(200).json({
     status: "success",
-    length: ratings.length <= 0 ? 0 : ratings.length,
+    length: ratings?.length <= 0 ? 0 : ratings?.length,
     ratings,
   });
 });
@@ -70,6 +67,15 @@ export const createRatingReviews = catchAsync(async (req, res, next) => {
 
   if (!service) {
     return next(new AppError("No service found with provided id.", 404));
+  }
+
+  // check if aleary have a rating
+  const isAlreadyHaveRating = await Ratings.findOne({
+    orderId: req.body.orderId,
+    userId: uid,
+  });
+  if (isAlreadyHaveRating) {
+    return next(new AppError("Already have an rating.", 400));
   }
 
   const ratings = await Ratings.create({

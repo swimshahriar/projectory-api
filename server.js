@@ -1,6 +1,4 @@
-import http from "http";
 import express from "express";
-import { Server } from "socket.io";
 import mongoose from "mongoose";
 import cors from "cors";
 import helmet from "helmet";
@@ -28,62 +26,9 @@ import { chatsRoutes } from "./routes/chatsRoutes.js";
 import { siteSettingsRoutes } from "./routes/siteSettingsRoutes.js";
 import { ordersRoutes } from "./routes/ordersRoutes.js";
 
-// express, http server, env variables
+// express, env variables
 const app = express();
-const server = http.createServer(app);
 dotenv.config();
-
-// socket creation
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
-});
-
-// ---------------------- socket functions --------------------------
-let users = [];
-
-// ------------------- helper functions --------------
-const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
-};
-
-const removeUser = (socketId) => {
-  users = users.filter((user) => user.socketId !== socketId);
-};
-
-const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
-};
-
-// ------------------ socket connection -----------------
-io.on("connection", (socket) => {
-  // on connect
-  console.log("new user connected!");
-
-  // take user and socket id from user
-  socket.on("addUser", (userId) => {
-    addUser(userId, socket.id);
-    io.emit("getUsers", users);
-  });
-
-  //send and get message
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-    const user = getUser(receiverId);
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      text,
-    });
-  });
-
-  // on disconnect remove user
-  socket.on("disconnect", () => {
-    console.log("a user left!");
-    removeUser(socket.id);
-    io.emit("getUsers", users);
-  });
-});
 
 // middlewares
 app.use(logger("tiny"));
@@ -110,7 +55,6 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 // server connect
-
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -120,12 +64,10 @@ mongoose
   })
   .then(() => {
     console.log("DB Connected!");
-    server.listen(process.env.PORT || 8000, () =>
-      console.log("Server Started.")
-    );
+    app.listen(process.env.PORT || 8000, () => console.log("Server Started."));
   });
 
 process.on("unhandledRejection", (err) => {
   console.error(err.name, err.message);
-  server.close(() => process.exit(1));
+  app.close(() => process.exit(1));
 });

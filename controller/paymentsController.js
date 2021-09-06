@@ -3,6 +3,7 @@ import crypto from "crypto";
 import catchAsync from "../utils/catchAsync.js";
 import { Payments } from "../model/paymentsModel.js";
 import AppError from "../utils/appError.js";
+import { User } from "../model/userModel.js";
 
 // --------------------- topup -------------------
 export const getPayments = catchAsync(async (req, res, next) => {
@@ -32,10 +33,15 @@ export const getPayments = catchAsync(async (req, res, next) => {
   });
 });
 
-// --------------------- topup -------------------
+// --------------------- topup/withdraw -------------------
 export const topup = catchAsync(async (req, res, next) => {
-  const { _id: userId, userName } = req.user;
-  const { method, amount } = req.body;
+  const { _id: userId, userName, balance } = req.user;
+  const { method, amount, paymentType } = req.body;
+
+  // check if have balance
+  if (paymentType === "withdraw" && balance < amount) {
+    return next(new AppError("You do not have enough balance.", 400));
+  }
 
   const id = crypto.randomBytes(3).toString("hex");
 
@@ -47,6 +53,20 @@ export const topup = catchAsync(async (req, res, next) => {
     ...req.body,
   });
   await payments.save();
+
+  if (paymentType === "withdraw") {
+    // fetch user and admin data
+    const userInfo = await User.findById(userId);
+    const adminInfo = await User.findOne({ role: "admin" });
+
+    // update admin and user balance
+    await User.findByIdAndUpdate(userInfo._id, {
+      balance: userInfo.balance - amount,
+    });
+    await User.findByIdAndUpdate(adminInfo._id, {
+      balance: adminInfo.balance + amount,
+    });
+  }
 
   return res.status(201).json({
     status: "success",

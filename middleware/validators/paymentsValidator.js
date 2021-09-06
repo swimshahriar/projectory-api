@@ -8,3 +8,7 @@ export const paymentsValidateRules = () => {
     body("method").isString().notEmpty(),
   ];
 };
+
+export const paymentsUpdateRules = () => {
+  return [body("status").isString().notEmpty()];
+};

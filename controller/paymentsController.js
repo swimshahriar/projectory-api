@@ -77,7 +77,7 @@ export const topup = catchAsync(async (req, res, next) => {
 // --------------------- update payment status --------------------
 export const updatePaymentStatus = catchAsync(async (req, res, next) => {
   const { pid } = req.params;
-  const { status } = req.params;
+  const { status } = req.body;
 
   // check if payment exist
   const payment = await Payments.findById(pid);

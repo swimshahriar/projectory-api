@@ -24,10 +24,10 @@ router.patch(
   paymentsUpdateRules(),
   validate,
   checkAuth,
-  restrictTo(["admin"]),
+  restrictTo("admin"),
   updatePaymentStatus
 );
-router.delete("/:pid", checkAuth, restrictTo(["admin"]), deletePayment);
+router.delete("/:pid", checkAuth, restrictTo("admin"), deletePayment);
 
 // exports
 export const paymentsRoutes = router;

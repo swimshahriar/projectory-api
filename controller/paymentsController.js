@@ -1,9 +1,13 @@
 import crypto from "crypto";
+import Stripe from "stripe";
 // internal imports
 import catchAsync from "../utils/catchAsync.js";
 import { Payments } from "../model/paymentsModel.js";
 import AppError from "../utils/appError.js";
 import { User } from "../model/userModel.js";
+import { SiteSettings } from "../model/siteSettingsModel.js";
+
+const stripe = new Stripe(process.env.STRIPE_KEY);
 
 // --------------------- get payments -------------------
 export const getPayments = catchAsync(async (req, res, next) => {
@@ -33,6 +37,41 @@ export const getPayments = catchAsync(async (req, res, next) => {
   });
 });
 
+// -------------------- if method stripe ------------------
+export const stripeTopup = catchAsync(async (req, res, next) => {
+  const { amount } = req.body;
+
+  // get usd to bdt rate
+  const settings = await SiteSettings.find();
+  // amount bdt to usd to cents
+  const unitAmount = parseInt((amount / settings[0].bdtToUsd) * 100);
+
+  // stripe session
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "Topup",
+          },
+          unit_amount: unitAmount,
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${process.env.FRONT_END_URL}/payment-succeed/${amount}`,
+    cancel_url: `${process.env.FRONT_END_URL}/user-topup/`,
+  });
+
+  return res.status(200).json({
+    status: "success",
+    url: session.url,
+  });
+});
+
 // --------------------- topup/withdraw -------------------
 export const topup = catchAsync(async (req, res, next) => {
   const { _id: userId, userName, balance } = req.user;
@@ -50,9 +89,17 @@ export const topup = catchAsync(async (req, res, next) => {
     userId,
     userName,
     id,
+    status: method === "stripe" ? "succeed" : "pending",
     ...req.body,
   });
   await payments.save();
+
+  // update user balance if stripe
+  if (method === "stripe") {
+    await User.findByIdAndUpdate(userId, {
+      balance: parseFloat(parseFloat(balance) + parseFloat(amount)).toFixed(2),
+    });
+  }
 
   if (paymentType === "withdraw") {
     // fetch user and admin data

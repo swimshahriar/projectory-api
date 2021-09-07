@@ -9,6 +9,7 @@ import { checkAuth } from "../middleware/checkAuth.js";
 import {
   deletePayment,
   getPayments,
+  stripeTopup,
   topup,
   updatePaymentStatus,
 } from "../controller/paymentsController.js";
@@ -19,6 +20,7 @@ const router = Router();
 // routes
 router.get("/", checkAuth, getPayments);
 router.post("/", paymentsValidateRules(), validate, checkAuth, topup);
+router.post("/stripe", checkAuth, stripeTopup);
 router.patch(
   "/:pid",
   paymentsUpdateRules(),

@@ -98,6 +98,7 @@ export const topup = catchAsync(async (req, res, next) => {
   if (method === "stripe") {
     await User.findByIdAndUpdate(userId, {
       balance: parseFloat(parseFloat(balance) + parseFloat(amount)).toFixed(2),
+      lastTopup: new Date(),
     });
   }
 
@@ -144,6 +145,11 @@ export const updatePaymentStatus = catchAsync(async (req, res, next) => {
     await User.findByIdAndUpdate(admin._id, {
       balance: parseFloat(admin.balance - payment.amount),
     });
+
+    const user = await User.findOne({ _id: payment.userId });
+    await User.findByIdAndUpdate(user._id, {
+      lastWithdraw: new Date(),
+    });
   } else if (status === "failed" && payment.paymentType === "withdraw") {
     const admin = await User.findOne({ role: "admin" });
     await User.findByIdAndUpdate(admin._id, {
@@ -162,6 +168,7 @@ export const updatePaymentStatus = catchAsync(async (req, res, next) => {
 
     await User.findByIdAndUpdate(user._id, {
       balance: parseFloat(user.balance + parseFloat(parpayment.amount)),
+      lastTopup: new Date(),
     });
   }
 

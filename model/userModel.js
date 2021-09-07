@@ -96,8 +96,8 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  lastTopUp: Object,
-  lastWithdraw: Object,
+  lastTopup: Date,
+  lastWithdraw: Date,
   password: {
     type: String,
     required: [true, "Password required."],

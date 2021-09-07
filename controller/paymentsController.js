@@ -5,7 +5,7 @@ import { Payments } from "../model/paymentsModel.js";
 import AppError from "../utils/appError.js";
 import { User } from "../model/userModel.js";
 
-// --------------------- topup -------------------
+// --------------------- get payments -------------------
 export const getPayments = catchAsync(async (req, res, next) => {
   const { uid, pid, type } = req.query;
 
@@ -64,7 +64,7 @@ export const topup = catchAsync(async (req, res, next) => {
       balance: userInfo.balance - amount,
     });
     await User.findByIdAndUpdate(adminInfo._id, {
-      balance: adminInfo.balance + amount,
+      balance: parseFloat(adminInfo.balance + parseFloat(amount)),
     });
   }
 
@@ -88,6 +88,34 @@ export const updatePaymentStatus = catchAsync(async (req, res, next) => {
   // if payment in succeed or failed state
   if (payment.status === "succeed" || payment.status === "failed") {
     return next(new AppError("Cannot change status of the payment.", 400));
+  }
+
+  // if type withdraw
+  if (status === "succeed" && payment.paymentType === "withdraw") {
+    const admin = await User.findOne({ role: "admin" });
+
+    await User.findByIdAndUpdate(admin._id, {
+      balance: parseFloat(admin.balance - payment.amount),
+    });
+  } else if (status === "failed" && payment.paymentType === "withdraw") {
+    const admin = await User.findOne({ role: "admin" });
+    await User.findByIdAndUpdate(admin._id, {
+      balance: parseFloat(admin.balance - payment.amount),
+    });
+
+    const user = await User.findOne({ _id: payment.userId });
+    await User.findByIdAndUpdate(user._id, {
+      balance: parseFloat(user.balance + parseFloat(payment.amount)),
+    });
+  }
+
+  // if type topup
+  if (status === "succeed" && payment.paymentType === "topup") {
+    const user = await User.findOne({ _id: payment.userId });
+
+    await User.findByIdAndUpdate(user._id, {
+      balance: parseFloat(user.balance + parseFloat(parpayment.amount)),
+    });
   }
 
   // update

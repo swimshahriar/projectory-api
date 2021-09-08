@@ -19,8 +19,8 @@ export const getServices = catchAsync(async (req, res, next) => {
     services = await Services.find({ userId: req.query.uid }).sort(
       "-createdAt"
     );
-  } else if (req.query.category) {
-    services = await Services.find({ category: req.query.category }).sort(
+  } else if (req.query.cat && !req.query.search) {
+    services = await Services.find({ category: req.query.cat }).sort(
       "-createdAt"
     );
   } else {

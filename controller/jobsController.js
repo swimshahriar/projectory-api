@@ -19,7 +19,7 @@ export const createJob = CatchAsync(async (req, res, next) => {
 
 // get jobs
 export const getJobs = CatchAsync(async (req, res, next) => {
-  const { uid, status, jid } = req.query;
+  const { uid, status, jid, cat } = req.query;
 
   let jobs;
 
@@ -31,6 +31,11 @@ export const getJobs = CatchAsync(async (req, res, next) => {
     jobs = await Jobs.find({ userId: uid, status }).sort("-createdAt");
   } else if (jid) {
     jobs = await Jobs.find({ _id: jid }).sort("-createdAt");
+  } else if (cat) {
+    jobs = await Jobs.find({ category: cat })
+      .where("status")
+      .equals("public")
+      .sort("-createdAt");
   } else {
     jobs = await Jobs.find()
       .where("status")

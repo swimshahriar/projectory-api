@@ -4,12 +4,12 @@ const jobsSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      maxlength: 100,
+
       required: [true, "Title required."],
     },
     details: {
       type: String,
-      maxlength: 500,
+
       required: [true, "Details is required."],
     },
     price: {

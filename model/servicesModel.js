@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 
 const servicesSchema = new mongoose.Schema(
   {
-    title: { type: String, maxlength: 50, required: [true, "Title required."] },
+    title: { type: String, required: [true, "Title required."] },
     images: {
       type: Array,
-      maxlength: 3,
+
       required: [true, "An image is required."],
     },
     about: {
       type: String,
-      maxlength: 200,
+
       required: [true, "About this gig is required."],
     },
     userId: {
@@ -55,12 +55,12 @@ const servicesSchema = new mongoose.Schema(
         },
         deliveryTime: {
           type: Number,
-          max: 30,
+
           required: true,
         },
         features: {
           type: Array,
-          maxlength: 7,
+
           required: true,
         },
       },
@@ -72,6 +72,9 @@ const servicesSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// creating index
+servicesSchema.index({ title: "text" });
 
 // export
 export const Services = mongoose.model("Service", servicesSchema);

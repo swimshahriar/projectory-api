@@ -38,18 +38,32 @@ export const getJobs = CatchAsync(async (req, res, next) => {
       .sort("-createdAt");
   } else if (!cat && search) {
     jobs = await Jobs.find({
-      $text: {
-        $search: search,
-      },
-      status: "public",
+      $and: [
+        {
+          $text: {
+            $search: search,
+          },
+        },
+        {
+          status: "public",
+        },
+      ],
     }).sort("-createdAt");
   } else if (cat && search) {
     jobs = await Jobs.find({
-      $text: {
-        $search: search,
-      },
-      category: cat,
-      status: "public",
+      $and: [
+        {
+          $text: {
+            $search: search,
+          },
+        },
+        {
+          category: cat,
+        },
+        {
+          status: "public",
+        },
+      ],
     }).sort("-createdAt");
   }
 

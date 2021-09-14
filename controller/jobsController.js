@@ -65,6 +65,8 @@ export const getJobs = CatchAsync(async (req, res, next) => {
         },
       ],
     }).sort("-createdAt");
+  } else {
+    jobs = await Jobs.find({ status: "public" }).sort("-createdAt");
   }
 
   return res

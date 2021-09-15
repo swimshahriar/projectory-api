@@ -170,7 +170,7 @@ export const updateServices = catchAsync(async (req, res, next) => {
     // update
     const updatedService = await Services.findOneAndUpdate(
       { _id: sid },
-      { ...req.body, images: imageUrls },
+      { ...req.body, images: imgUrls },
       { new: true, runValidators: true }
     );
     session.endSession();

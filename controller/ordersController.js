@@ -91,10 +91,14 @@ export const updateOrder = catchAsync(async (req, res, next) => {
   }
 
   // status update on job
-  if(order?.type === "jobs"){
+  if (
+    order?.type === "jobs" &&
+    req.body.status !== "requested" &&
+    req.body.status !== "canceled"
+  ) {
     const job = await Jobs.findById(order.jobId);
 
-    job.status = order.status;
+    job.status = req.body.status;
     await job.save();
   }
 
@@ -134,9 +138,15 @@ export const finishedOrder = catchAsync(async (req, res, next) => {
 
   // check if user is the reqPerson
   const order = await Orders.findById(oid);
-  if (order.type === "services" && order.reqPersonId.toString() !== uid.toString()) {
+  if (
+    order.type === "services" &&
+    order.reqPersonId.toString() !== uid.toString()
+  ) {
     return next(new AppError("You are not authorized.", 401));
-  } else if(order.type === "jobs" && order.recPersonId.toString() !== uid.toString()){
+  } else if (
+    order.type === "jobs" &&
+    order.recPersonId.toString() !== uid.toString()
+  ) {
     return next(new AppError("You are not authorized.", 401));
   }
 
@@ -209,7 +219,7 @@ export const finishedOrder = catchAsync(async (req, res, next) => {
   await User.findOneAndUpdate({ role: "admin" }, { balance: newAdminMoney });
 
   // status update on job
-  if(order?.type === "jobs"){
+  if (order?.type === "jobs") {
     const job = await Jobs.findById(order.jobId);
 
     job.status = "finished";

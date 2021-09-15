@@ -8,7 +8,7 @@ import catchAsync from "../utils/catchAsync.js";
 export const getConversations = catchAsync(async (req, res, next) => {
   const { _id: uid } = req.user;
 
-  const conversations = await Conversations.find({ members: { $in: [uid] } });
+  const conversations = await Conversations.find({ members: { $in: [uid] } }).sort("-updatedAt");
 
   return res.status(200).json({
     status: "success",

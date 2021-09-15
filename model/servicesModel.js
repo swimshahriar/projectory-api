@@ -28,8 +28,8 @@ const servicesSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "web-developement",
-        "mobile-developement",
+        "web-development",
+        "mobile-development",
         "graphics-designing",
         "seo",
         "digital-marketing",

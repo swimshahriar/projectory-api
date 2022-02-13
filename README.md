@@ -46,6 +46,11 @@ CLOUD_SECRET=
 STRIPE_KEY=
 ```
 
+### Docker Setup
+Fill the `environments` in the `docker-compose.yml` file. Then run `docker compose up`. You can access the server at port `4000` on your local machine.
+
+Note: Make sure you have installed `Docker` in your machine.
+
 ### Links 🔗
 
 - Frontend Repo: [Click Here](https://github.com/swimshahriar/projectory-frontend) <br/>
